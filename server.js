@@ -8,6 +8,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static('public'));
 
 // Veritabanı bağlantısı
 const db = new Pool({
@@ -108,10 +109,7 @@ app.delete('/api/musteri/:id', async (req, res) => {
   }
 });
 
-// Test
-app.get('/', (req, res) => {
-  res.json({ mesaj: 'Umzug App çalisiyor! 🚛' });
-});
+
 
 app.listen(PORT, () => {
   console.log('✅ Sunucu http://localhost:${PORT} adresinde çalisiyor');
