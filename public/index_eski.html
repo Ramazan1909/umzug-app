@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Umzug App</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:Arial,sans-serif;background:#f0f4f8;}
+header{background:#1a3a6e;color:white;padding:1rem 2rem;font-size:1.5rem;font-weight:bold;}
+.container{max-width:900px;margin:2rem auto;padding:0 1rem;}
+.card{background:white;border-radius:8px;padding:1.5rem;margin-bottom:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,0.1);}
+h2{color:#1a3a6e;margin-bottom:1rem;}
+.form-group{margin-bottom:1rem;}
+label{display:block;font-weight:bold;margin-bottom:0.3rem;color:#555;}
+input,textarea{width:100%;padding:0.6rem;border:1px solid #ddd;border-radius:5px;font-size:1rem;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+button{background:#1a3a6e;color:white;border:none;padding:0.8rem 2rem;border-radius:5px;font-size:1rem;cursor:pointer;}
+button:hover{background:#2a5a9e;}
+.red{background:#c03030;}
+.musteri-kart{border:1px solid #ddd;border-radius:6px;padding:1rem;margin-bottom:0.8rem;display:flex;justify-content:space-between;align-items:center;}
+.musteri-adi{font-weight:bold;}
+.musteri-bilgi{font-size:0.8rem;color:#888;margin-top:3px;}
+.bos{text-align:center;color:#aaa;padding:2rem;}
+.mesaj{padding:0.8rem;border-radius:5px;margin-bottom:1rem;display:none;}
+.basarili{background:#d4edda;color:#155724;display:block;}
+.hata{background:#f8d7da;color:#721c24;display:block;}
+</style>
+</head>
+<body>
+<header>Umzug App - Musteri Yonetimi</header>
+<div class="container">
+<div id="mesaj" class="mesaj"></div>
+<div class="card">
+<h2>Yeni Musteri Ekle</h2>
+<div class="grid2">
+<div class="form-group"><label>Ad Soyad</label><input id="name" type="text" placeholder="Max Muller"></div>
+<div class="form-group"><label>Telefon</label><input id="telefon" type="tel" placeholder="+49 160"></div>
+<div class="form-group"><label>E-Mail</label><input id="email" type="email"></div>
+<div class="form-group"><label>Umzug Tarihi</label><input id="umzugsdatum" type="date"></div>
+</div>
+<div class="form-group"><label>Notlar</label><textarea id="notizen" rows="2"></textarea></div>
+<button onclick="kaydet()">Kaydet</button>
+</div>
+<div class="card">
+<h2>Musteri Listesi</h2>
+<div id="liste"><div class="bos">Yukleniyor...</div></div>
+</div>
+</div>
+<script>
+function yukle() {
+  fetch('/api/musteriler')
+    .then(function(r){ return r.json(); })
+    .then(function(liste){
+      var el = document.getElementById('liste');
+      if(liste.length === 0){
+        el.innerHTML = '<div class="bos">Hic musteri yok.</div>';
+        return;
+      }
+      var html = '';
+      for(var i=0; i<liste.length; i++){
+        var m = liste[i];
+        html += '<div class="musteri-kart">';
+        html += '<div><div class="musteri-adi">' + m.name + '</div>';
+        html += '<div class="musteri-bilgi">' + (m.telefon||'-') + ' | ' + (m.email||'-') + '</div></div>';
+        html += '<button class="red" onclick="sil(' + m.id + ')">Sil</button>';
+        html += '</div>';
+      }
+      el.innerHTML = html;
+    });
+}
+
+function kaydet() {
+  var name = document.getElementById('name').value;
+  if(!name){ alert('Lutfen isim girin!'); return; }
+  fetch('/api/musteri', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      name: name,
+      telefon: document.getElementById('telefon').value,
+      email: document.getElementById('email').value,
+      umzugsdatum: document.getElementById('umzugsdatum').value,
+      notizen: document.getElementById('notizen').value,
+      angebotsnr: 'UMZ-' + Date.now().toString().slice(-6)
+    })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(s){
+    if(s.basarili){
+      document.getElementById('name').value='';
+      document.getElementById('telefon').value='';
+      document.getElementById('email').value='';
+      document.getElementById('umzugsdatum').value='';
+      document.getElementById('notizen').value='';
+      yukle();
+      alert('Musteri kaydedildi!');
+    }
+  });
+}
+
+function sil(id) {
+  if(!confirm('Silmek istiyorsunuz?')) return;
+  fetch('/api/musteri/' + id, {method: 'DELETE'})
+    .then(function(){ yukle(); });
+}
+
+yukle();
+</script>
+</body>
+</html>

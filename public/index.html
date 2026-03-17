@@ -3,109 +3,908 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Umzug App</title>
+<title>UmzugPreisCheck – Angebotssystem v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
+:root{--bg:#f0f4f8;--surface:#fff;--surface2:#f5f7fa;--border:#d0d9e4;--text:#1a2a3a;--text-muted:#4a6080;--text-dim:#8a9ab0;--brand-green:#2eb870;--brand-navy:#1a3a6e;--warn:#e07020;--danger:#c03030;}
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:Arial,sans-serif;background:#f0f4f8;}
-header{background:#1a3a6e;color:white;padding:1rem 2rem;font-size:1.5rem;font-weight:bold;}
-.container{max-width:900px;margin:2rem auto;padding:0 1rem;}
-.card{background:white;border-radius:8px;padding:1.5rem;margin-bottom:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,0.1);}
-h2{color:#1a3a6e;margin-bottom:1rem;}
-.form-group{margin-bottom:1rem;}
-label{display:block;font-weight:bold;margin-bottom:0.3rem;color:#555;}
-input,textarea{width:100%;padding:0.6rem;border:1px solid #ddd;border-radius:5px;font-size:1rem;}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
-button{background:#1a3a6e;color:white;border:none;padding:0.8rem 2rem;border-radius:5px;font-size:1rem;cursor:pointer;}
-button:hover{background:#2a5a9e;}
-.red{background:#c03030;}
-.musteri-kart{border:1px solid #ddd;border-radius:6px;padding:1rem;margin-bottom:0.8rem;display:flex;justify-content:space-between;align-items:center;}
-.musteri-adi{font-weight:bold;}
-.musteri-bilgi{font-size:0.8rem;color:#888;margin-top:3px;}
-.bos{text-align:center;color:#aaa;padding:2rem;}
-.mesaj{padding:0.8rem;border-radius:5px;margin-bottom:1rem;display:none;}
-.basarili{background:#d4edda;color:#155724;display:block;}
-.hata{background:#f8d7da;color:#721c24;display:block;}
+body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+header{background:var(--brand-navy);border-bottom:3px solid var(--brand-green);padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(26,58,110,.2);}
+.logo{font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:800;color:#fff;letter-spacing:1px;}
+.logo span{color:var(--brand-green);}
+.logo-sub{font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.5);display:block;margin-top:-3px;}
+.hdr-right{display:flex;align-items:center;gap:.8rem;}
+.hdr-phone{font-family:'Barlow Condensed',sans-serif;font-size:.95rem;font-weight:700;color:var(--brand-green);}
+.hdr-btns{display:flex;gap:.35rem;}
+.hdr-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:5px;padding:.32rem .65rem;font-size:.72rem;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.hdr-btn:hover{background:var(--brand-green);border-color:var(--brand-green);}
+.tabs{display:flex;background:var(--brand-navy);border-bottom:3px solid var(--brand-green);padding:0 1.5rem;overflow-x:auto;}
+.tab-btn{padding:.75rem 1.1rem;background:none;border:none;color:rgba(255,255,255,.5);font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-3px;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:.35rem;}
+.tab-btn:hover{color:#fff;}
+.tab-btn.active{color:var(--brand-green);border-bottom-color:var(--brand-green);}
+.tab-badge{background:var(--brand-green);color:#fff;border-radius:999px;font-size:.62rem;padding:1px 5px;font-weight:700;}
+.content{padding:1.4rem;max-width:1100px;margin:0 auto;}
+.tab-panel{display:none;animation:fadeIn .25s;}
+.tab-panel.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.3rem;margin-bottom:1.1rem;}
+.card-split{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;margin-bottom:1.1rem;}
+.card-half{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.3rem;}
+.card-half.loading{border-left:3px solid var(--brand-green);}
+.card-half.unloading{border-left:3px solid var(--brand-navy);}
+.sec-title{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--brand-navy);margin-bottom:.9rem;padding-bottom:.45rem;border-bottom:2px solid var(--brand-green);display:flex;align-items:center;gap:.5rem;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:.85rem;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.85rem;}
+.c2{grid-column:span 2;}
+.fg{margin-bottom:.75rem;}
+label{display:block;font-size:.7rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text-muted);margin-bottom:.32rem;}
+input[type=text],input[type=email],input[type=tel],input[type=number],input[type=date],select,textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:5px;color:var(--text);padding:.48rem .68rem;font-family:'Barlow',sans-serif;font-size:.86rem;transition:border-color .2s;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--brand-navy);box-shadow:0 0 0 2px rgba(26,58,110,.1);}
+textarea{resize:vertical;min-height:55px;}
+.rg{display:flex;gap:.35rem;}
+.rb{flex:1;text-align:center;padding:.38rem;background:var(--surface2);border:1px solid var(--border);border-radius:5px;cursor:pointer;font-size:.78rem;font-weight:600;color:var(--text-muted);transition:all .15s;user-select:none;}
+.rb:hover{border-color:var(--brand-navy);color:var(--text);}
+.rb.sel{background:var(--brand-navy);color:#fff;border-color:var(--brand-navy);}
+.room-sec{margin-bottom:1.1rem;}
+.room-hdr{background:var(--brand-navy);padding:.5rem .85rem;border-radius:6px 6px 0 0;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;font-size:.83rem;color:#fff;display:flex;align-items:center;gap:.45rem;cursor:pointer;user-select:none;}
+.room-hdr .rv{margin-left:auto;color:var(--brand-green);font-size:.8rem;font-weight:700;}
+.room-body{border:1px solid var(--border);border-top:none;border-radius:0 0 6px 6px;overflow:hidden;}
+.th{display:grid;grid-template-columns:1fr 50px 60px 70px;background:rgba(26,58,110,.05);border-bottom:1px solid var(--border);font-size:.65rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text-dim);}
+.th div{padding:.35rem .7rem;text-align:center;}
+.th div:first-child{text-align:left;}
+.fr{display:grid;grid-template-columns:1fr 50px 60px 70px;border-bottom:1px solid var(--border);align-items:center;}
+.fr:last-child{border-bottom:none;}
+.fr:nth-child(even){background:rgba(0,0,0,.012);}
+.fn{padding:.4rem .7rem;font-size:.8rem;}
+.fz{text-align:center;font-size:.65rem;color:var(--text-dim);}
+.fm{text-align:center;font-size:.7rem;color:var(--text-muted);}
+.fq{padding:.25rem .4rem;}
+.fq input{background:transparent;border:1px solid transparent;text-align:center;padding:.2rem;width:100%;font-size:.8rem;color:var(--brand-navy);font-weight:700;}
+.fq input:focus{background:#eef2f8;border-color:var(--brand-navy);border-radius:3px;outline:none;}
+.vol-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1rem 1.3rem;display:flex;align-items:center;gap:1.4rem;margin-bottom:1.1rem;flex-wrap:wrap;}
+.vn{font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:800;color:var(--brand-navy);line-height:1;}
+.vl{font-size:.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;}
+.vbw{flex:1;min-width:150px;}
+.vbb{background:var(--border);border-radius:999px;height:7px;overflow:hidden;}
+.vbf{height:100%;background:linear-gradient(90deg,var(--brand-navy),var(--brand-green));border-radius:999px;transition:width .4s;}
+.vbl{display:flex;justify-content:space-between;font-size:.6rem;color:var(--text-dim);margin-top:3px;}
+.kr{display:flex;justify-content:space-between;align-items:center;padding:.65rem .95rem;border-bottom:1px solid var(--border);}
+.kr:last-child{border-bottom:none;}
+.kn{font-size:.85rem;}
+.kc{font-size:.7rem;color:var(--text-dim);margin-top:1px;}
+.ks{font-size:.65rem;color:#bbb;margin-top:1px;}
+.kv{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;color:var(--brand-navy);white-space:nowrap;}
+.kr.bold{background:#eef2fa;font-weight:700;}
+.kr.bold .kv{font-size:1.2rem;}
+.kr.hl{background:#fff8e8;border-left:3px solid #e0a020;}
+.kr.hl .kv{color:#c07000;}
+.qt{background:var(--brand-navy);color:#fff;border-radius:8px;padding:1rem 1.3rem;display:flex;justify-content:space-between;align-items:center;margin-top:.5rem;border-left:5px solid var(--brand-green);}
+.qtl{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;}
+.qtv{font-family:'Barlow Condensed',sans-serif;font-size:1.9rem;font-weight:800;}
+.btn{padding:.6rem 1.3rem;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:.9rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .2s;border:none;}
+.btn-p{background:var(--brand-navy);color:#fff;}.btn-p:hover{background:#122d57;}
+.btn-g{background:var(--brand-green);color:#fff;}.btn-g:hover{background:#259e60;}
+.btn-o{background:transparent;color:var(--brand-navy);border:2px solid var(--brand-navy);}.btn-o:hover{background:var(--brand-navy);color:#fff;}
+.btn-wa{background:#25d366;color:#fff;}.btn-wa:hover{background:#1da851;}
+.brow{display:flex;gap:.7rem;margin-top:1.1rem;flex-wrap:wrap;}
+.notif{position:fixed;bottom:1.3rem;right:1.3rem;background:var(--brand-navy);color:#fff;padding:.65rem 1.1rem;border-radius:8px;font-size:.82rem;font-weight:600;z-index:9999;border-left:4px solid var(--brand-green);box-shadow:0 4px 16px rgba(0,0,0,.2);transform:translateY(100px);opacity:0;transition:all .3s;}
+.notif.show{transform:translateY(0);opacity:1;}
+.ac-wrap{position:relative;}
+.ac-list{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid var(--border);border-top:none;border-radius:0 0 6px 6px;z-index:999;max-height:170px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.1);}
+.ac-item{padding:.45rem .7rem;cursor:pointer;font-size:.82rem;border-bottom:1px solid var(--border);}
+.ac-item:last-child{border-bottom:none;}
+.ac-item:hover{background:var(--surface2);}
+.km-st{font-size:.72rem;color:var(--brand-navy);margin-top:.28rem;min-height:1rem;}
+.fz-row{display:grid;grid-template-columns:2rem 1fr 60px 70px 70px 80px;align-items:center;gap:.5rem;padding:.55rem .75rem;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;}
+.fz-row:last-child{border-bottom:none;}
+.fz-row:hover{background:#f5f7fa;}
+.fz-row.active{background:#f0fff8;border-left:3px solid var(--brand-green);}
+.fz-row-icon{font-size:1.2rem;text-align:center;}
+.fz-row-name{font-weight:700;font-size:.83rem;color:var(--text);}
+.fz-row-sub{font-size:.67rem;color:var(--text-dim);margin-top:1px;}
+.fz-row-val{text-align:center;font-size:.78rem;color:var(--text-muted);font-weight:600;}
+.fz-row-cnt{display:flex;align-items:center;justify-content:center;gap:.3rem;}
+.cnt-btn{width:22px;height:22px;border-radius:50%;border:1px solid var(--border);background:#fff;font-size:.9rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--brand-navy);transition:all .15s;line-height:1;}
+.cnt-btn:hover{background:var(--brand-navy);color:#fff;border-color:var(--brand-navy);}
+.cnt-val{font-family:'Barlow Condensed',sans-serif;font-size:1.2rem;font-weight:800;color:var(--brand-navy);min-width:18px;text-align:center;}
+.cust-list{display:flex;flex-direction:column;gap:.45rem;max-height:320px;overflow-y:auto;}
+.ci{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:.65rem .9rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:.75rem;}
+.ci:hover{border-color:var(--brand-navy);background:#eef2fa;}
+.ci.act{border-color:var(--brand-green);background:#f0fff8;}
+.ci-nm{font-weight:600;font-size:.85rem;}
+.ci-mt{font-size:.7rem;color:var(--text-muted);margin-top:2px;}
+.ci-del{background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:.95rem;padding:.18rem .3rem;border-radius:4px;flex-shrink:0;}
+.ci-del:hover{color:var(--danger);background:#ffeaea;}
+.empty{text-align:center;padding:2rem;color:var(--text-dim);font-size:.83rem;}
+.itag{display:inline-block;background:rgba(26,58,110,.07);border:1px solid rgba(26,58,110,.18);color:var(--brand-navy);border-radius:4px;font-size:.65rem;padding:1px 5px;font-weight:600;letter-spacing:.5px;vertical-align:middle;}
+@media(max-width:700px){
+  .g2,.g3,.card-split{grid-template-columns:1fr!important;}
+  .c2{grid-column:span 1!important;}
+  .content{padding:.9rem;}
+  .tabs{padding:0 .4rem;}
+  .hdr-phone{display:none;}
+}
 </style>
 </head>
 <body>
-<header>Umzug App - Musteri Yonetimi</header>
-<div class="container">
-<div id="mesaj" class="mesaj"></div>
-<div class="card">
-<h2>Yeni Musteri Ekle</h2>
-<div class="grid2">
-<div class="form-group"><label>Ad Soyad</label><input id="name" type="text" placeholder="Max Muller"></div>
-<div class="form-group"><label>Telefon</label><input id="telefon" type="tel" placeholder="+49 160"></div>
-<div class="form-group"><label>E-Mail</label><input id="email" type="email"></div>
-<div class="form-group"><label>Umzug Tarihi</label><input id="umzugsdatum" type="date"></div>
-</div>
-<div class="form-group"><label>Notlar</label><textarea id="notizen" rows="2"></textarea></div>
-<button onclick="kaydet()">Kaydet</button>
-</div>
-<div class="card">
-<h2>Musteri Listesi</h2>
-<div id="liste"><div class="bos">Yukleniyor...</div></div>
-</div>
-</div>
-<script>
-function yukle() {
-  fetch('/api/musteriler')
-    .then(function(r){ return r.json(); })
-    .then(function(liste){
-      var el = document.getElementById('liste');
-      if(liste.length === 0){
-        el.innerHTML = '<div class="bos">Hic musteri yok.</div>';
-        return;
-      }
-      var html = '';
-      for(var i=0; i<liste.length; i++){
-        var m = liste[i];
-        html += '<div class="musteri-kart">';
-        html += '<div><div class="musteri-adi">' + m.name + '</div>';
-        html += '<div class="musteri-bilgi">' + (m.telefon||'-') + ' | ' + (m.email||'-') + '</div></div>';
-        html += '<button class="red" onclick="sil(' + m.id + ')">Sil</button>';
-        html += '</div>';
-      }
-      el.innerHTML = html;
-    });
-}
+<div class="notif" id="notif"></div>
 
-function kaydet() {
-  var name = document.getElementById('name').value;
-  if(!name){ alert('Lutfen isim girin!'); return; }
-  fetch('/api/musteri', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({
-      name: name,
-      telefon: document.getElementById('telefon').value,
-      email: document.getElementById('email').value,
-      umzugsdatum: document.getElementById('umzugsdatum').value,
-      notizen: document.getElementById('notizen').value,
-      angebotsnr: 'UMZ-' + Date.now().toString().slice(-6)
-    })
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(s){
-    if(s.basarili){
-      document.getElementById('name').value='';
-      document.getElementById('telefon').value='';
-      document.getElementById('email').value='';
-      document.getElementById('umzugsdatum').value='';
-      document.getElementById('notizen').value='';
-      yukle();
-      alert('Musteri kaydedildi!');
-    }
+<header>
+  <div>
+    <div class="logo">Umzug Preis<span>Check</span></div>
+    <span class="logo-sub">Angebotssystem v2</span>
+  </div>
+  <div class="hdr-right">
+    <div class="hdr-phone">📞 0160 7530900</div>
+    <div class="hdr-btns">
+      <button class="hdr-btn" onclick="tumunuKaydet()">💾 Speichern</button>
+      <button class="hdr-btn" onclick="yeniMusteri()">➕ Neu</button>
+      <button class="hdr-btn" onclick="showTab('kunden')">👥 Kunden</button>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button class="tab-btn active" onclick="showTab('kunde')" id="tb-kunde">👤 Kunde</button>
+  <button class="tab-btn" onclick="showTab('adressen')" id="tb-adressen">📍 Adressen</button>
+  <button class="tab-btn" onclick="showTab('moebel')" id="tb-moebel">🛋️ Möbel <span class="tab-badge" id="volBadge">0 m³</span></button>
+  <button class="tab-btn" onclick="showTab('fahrzeug')" id="tb-fahrzeug">🚛 Fahrzeug</button>
+  <button class="tab-btn" onclick="showTab('kosten')" id="tb-kosten">💶 Kosten</button>
+  <button class="tab-btn" onclick="showTab('angebot')" id="tb-angebot">📄 Angebot</button>
+  <button class="tab-btn" onclick="showTab('kunden')" id="tb-kunden">👥 Kunden</button>
+</nav>
+
+<div class="content">
+
+<!-- TAB: KUNDE -->
+<div id="tab-kunde" class="tab-panel active">
+  <div class="card">
+    <div class="sec-title">👤 Kundeninformationen</div>
+    <div class="g2">
+      <div class="fg"><label>Name *</label><input id="k_name" type="text" placeholder="Vor- und Nachname"></div>
+      <div class="fg"><label>Datum</label><input id="k_datum" type="date"></div>
+      <div class="fg"><label>Telefon</label><input id="k_tel" type="tel" placeholder="+49 ..."></div>
+      <div class="fg"><label>E-Mail</label><input id="k_email" type="email"></div>
+      <div class="fg"><label>Umzugstermin</label><input id="k_umzugsdatum" type="date"></div>
+      <div class="fg"><label>Angebotsnummer</label><input id="k_angebotsnr" type="text" value="UMZ-000001"></div>
+      <div class="fg"><label>Bearbeiter</label><input id="k_bearbeiter" type="text" placeholder="Ihr Name"></div>
+      <div class="fg"><label>Stadt</label><input id="k_stadt" type="text"></div>
+      <div class="fg c2"><label>Notizen</label><textarea id="k_notizen" placeholder="Besonderheiten..."></textarea></div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB: ADRESSEN -->
+<div id="tab-adressen" class="tab-panel">
+  <div class="card-split">
+    <div class="card-half loading">
+      <div class="sec-title" style="color:var(--brand-green)">🟢 Beladestelle (Von)</div>
+      <div class="fg"><label>Name</label><input id="b_name" type="text"></div>
+      <div class="fg"><label>Straße, Nr.</label><input id="b_strasse" type="text" placeholder="Musterstraße 12"></div>
+      <div class="fg"><label>PLZ / Ort</label>
+        <div class="ac-wrap">
+          <input id="b_plz" type="text" placeholder="z.B. Berlin" oninput="citySearch('b')" autocomplete="off">
+          <div class="ac-list" id="b_ac" style="display:none"></div>
+        </div>
+      </div>
+      <div class="fg"><label>Telefon</label><input id="b_tel" type="tel"></div>
+      <div class="fg"><label>Etage</label>
+        <select id="b_etage" onchange="autoPersonal();calcAll()">
+          <option value="0">EG (0€)</option>
+          <option value="30">1. Etage (30€)</option>
+          <option value="60">2. Etage (60€)</option>
+          <option value="90">3. Etage (90€)</option>
+          <option value="120">4. Etage (120€)</option>
+        </select>
+      </div>
+      <div class="fg"><label>Trageweg (m)</label><input id="b_trageweg" type="number" value="0" min="0" oninput="calcAll()"></div>
+      <div class="fg"><label>Aufzug</label>
+        <div class="rg">
+          <div class="rb" onclick="setRadio('b_aufzug','nein',this)">Nein</div>
+          <div class="rb sel" onclick="setRadio('b_aufzug','ja',this)">Ja</div>
+        </div>
+        <input type="hidden" id="b_aufzug" value="ja">
+      </div>
+      <div class="fg"><label>Möbellift</label>
+        <div class="rg">
+          <div class="rb sel" onclick="setRadio('b_lift','nein',this)">Nein</div>
+          <div class="rb" onclick="setRadio('b_lift','ja',this)">Ja (+150€)</div>
+        </div>
+        <input type="hidden" id="b_lift" value="nein">
+      </div>
+      <div class="fg"><label>Halteverbot</label>
+        <div class="rg">
+          <div class="rb sel" onclick="setRadio('b_halteverbot','nein',this)">Nein</div>
+          <div class="rb" onclick="setRadio('b_halteverbot','ja',this)">Ja (+80€)</div>
+        </div>
+        <input type="hidden" id="b_halteverbot" value="nein">
+      </div>
+    </div>
+    <div class="card-half unloading">
+      <div class="sec-title" style="color:var(--brand-navy)">🔵 Entladestelle (Nach)</div>
+      <div class="fg"><label>Name</label><input id="e_name" type="text"></div>
+      <div class="fg"><label>Straße, Nr.</label><input id="e_strasse" type="text" placeholder="Neue Straße 5"></div>
+      <div class="fg"><label>PLZ / Ort</label>
+        <div class="ac-wrap">
+          <input id="e_plz" type="text" placeholder="z.B. Hamburg" oninput="citySearch('e')" autocomplete="off">
+          <div class="ac-list" id="e_ac" style="display:none"></div>
+        </div>
+      </div>
+      <div class="fg"><label>Telefon</label><input id="e_tel" type="tel"></div>
+      <div class="fg"><label>Etage</label>
+        <select id="e_etage" onchange="autoPersonal();calcAll()">
+          <option value="0">EG (0€)</option>
+          <option value="30">1. Etage (30€)</option>
+          <option value="60">2. Etage (60€)</option>
+          <option value="90">3. Etage (90€)</option>
+          <option value="120">4. Etage (120€)</option>
+        </select>
+      </div>
+      <div class="fg"><label>Trageweg (m)</label><input id="e_trageweg" type="number" value="0" min="0" oninput="calcAll()"></div>
+      <div class="fg"><label>Aufzug</label>
+        <div class="rg">
+          <div class="rb" onclick="setRadio('e_aufzug','nein',this)">Nein</div>
+          <div class="rb sel" onclick="setRadio('e_aufzug','ja',this)">Ja</div>
+        </div>
+        <input type="hidden" id="e_aufzug" value="ja">
+      </div>
+      <div class="fg"><label>Möbellift</label>
+        <div class="rg">
+          <div class="rb sel" onclick="setRadio('e_lift','nein',this)">Nein</div>
+          <div class="rb" onclick="setRadio('e_lift','ja',this)">Ja (+150€)</div>
+        </div>
+        <input type="hidden" id="e_lift" value="nein">
+      </div>
+      <div class="fg"><label>Halteverbot</label>
+        <div class="rg">
+          <div class="rb sel" onclick="setRadio('e_halteverbot','nein',this)">Nein</div>
+          <div class="rb" onclick="setRadio('e_halteverbot','ja',this)">Ja (+80€)</div>
+        </div>
+        <input type="hidden" id="e_halteverbot" value="nein">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB: MÖBEL -->
+<div id="tab-moebel" class="tab-panel">
+  <div class="vol-card">
+    <div><div class="vn" id="totalVol">0.0</div><div class="vl">Gesamt m³</div></div>
+    <div><div class="vn" id="totalItems" style="font-size:1.3rem;color:var(--text-muted)">0</div><div class="vl">Objekte</div></div>
+    <div class="vbw">
+      <div class="vbb"><div class="vbf" id="volBar" style="width:0%"></div></div>
+      <div class="vbl"><span>0 m³</span><span>50 m³</span><span>100 m³</span></div>
+    </div>
+  </div>
+  <div id="moebelListe"></div>
+</div>
+
+<!-- TAB: FAHRZEUG -->
+<div id="tab-fahrzeug" class="tab-panel">
+  <div class="card">
+    <div class="sec-title">🚛 Fahrzeug & Transport</div>
+    <div id="fahrzeugEmpfehlung" style="background:linear-gradient(135deg,#1a3a6e,#2a5a9e);border-radius:8px;padding:1rem 1.2rem;color:#fff;margin-bottom:1rem;display:none;">
+      <div style="font-size:.82rem;font-weight:800;margin-bottom:.3rem;opacity:.7;text-transform:uppercase;">🤖 Empfehlung</div>
+      <div id="fahrzeugEmpfehlungText" style="font-size:.88rem;"></div>
+    </div>
+    <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:1rem;">
+      <div style="display:grid;grid-template-columns:2rem 1fr 60px 70px 70px 80px;background:rgba(26,58,110,.06);border-bottom:1px solid var(--border);padding:.4rem .75rem;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-dim);align-items:center;gap:.5rem;">
+        <div></div><div>Fahrzeug</div><div style="text-align:center;">Kap.</div><div style="text-align:center;">L/100km</div><div style="text-align:center;">km/h</div><div style="text-align:center;">Anzahl</div>
+      </div>
+      <div class="fz-row" id="fzrow_35" onclick="toggleFzRow('3.5t')">
+        <div class="fz-row-icon">🚐</div>
+        <div><div class="fz-row-name">3,5t Transporter</div><div class="fz-row-sub">Kleine Umzüge</div></div>
+        <div class="fz-row-val">15 m³</div><div class="fz-row-val">8 L</div><div class="fz-row-val">130</div>
+        <div class="fz-row-cnt" onclick="event.stopPropagation()">
+          <button class="cnt-btn" onclick="changeFz('3.5t',-1)">−</button>
+          <span id="cnt_35" class="cnt-val">0</span>
+          <button class="cnt-btn" onclick="changeFz('3.5t',1)">+</button>
+        </div>
+      </div>
+      <div class="fz-row" id="fzrow_75" onclick="toggleFzRow('7.5t')">
+        <div class="fz-row-icon">🚚</div>
+        <div><div class="fz-row-name">7,5t LKW</div><div class="fz-row-sub">Standard Umzug</div></div>
+        <div class="fz-row-val">35 m³</div><div class="fz-row-val">12 L</div><div class="fz-row-val">100</div>
+        <div class="fz-row-cnt" onclick="event.stopPropagation()">
+          <button class="cnt-btn" onclick="changeFz('7.5t',-1)">−</button>
+          <span id="cnt_75" class="cnt-val">0</span>
+          <button class="cnt-btn" onclick="changeFz('7.5t',1)">+</button>
+        </div>
+      </div>
+      <div class="fz-row" id="fzrow_12" onclick="toggleFzRow('12t')">
+        <div class="fz-row-icon">🚛</div>
+        <div><div class="fz-row-name">12t LKW</div><div class="fz-row-sub">Großumzüge · Mautpflichtig</div></div>
+        <div class="fz-row-val">55 m³</div><div class="fz-row-val">18 L</div><div class="fz-row-val">80</div>
+        <div class="fz-row-cnt" onclick="event.stopPropagation()">
+          <button class="cnt-btn" onclick="changeFz('12t',-1)">−</button>
+          <span id="cnt_12" class="cnt-val">0</span>
+          <button class="cnt-btn" onclick="changeFz('12t',1)">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="g3">
+      <div class="fg"><label>Entfernung (km)</label><input id="d_km" type="number" value="0" min="0" oninput="calcAll()"><div class="km-st" id="kmStatus"></div></div>
+      <div class="fg"><label>Kraftstoff (€/L)</label><input id="d_kraftstoff" type="number" value="1.80" min="0" step="0.01" oninput="calcAll()"></div>
+      <div class="fg"><label>Anhänger</label>
+        <div class="rg">
+          <div class="rb sel" onclick="setRadio('d_anhaenger','nein',this)">Nein</div>
+          <div class="rb" onclick="setRadio('d_anhaenger','ja',this)">Ja (+40€)</div>
+        </div>
+        <input type="hidden" id="d_anhaenger" value="nein">
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="sec-title">👷 Personal & Arbeitszeit</div>
+    <div id="personalEmpfCard" style="background:linear-gradient(135deg,#1a7a40,#2eb870);border-radius:8px;padding:1rem;color:#fff;margin-bottom:1rem;display:none;">
+      <div style="font-size:.82rem;font-weight:800;margin-bottom:.4rem;opacity:.8;text-transform:uppercase;">🤖 Empfehlung</div>
+      <div id="personalEmpfText" style="font-size:.86rem;"></div>
+    </div>
+    <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:1rem;">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;background:#f5f7fa;border-bottom:1px solid var(--border);">
+        <div style="padding:.6rem .8rem;text-align:center;border-right:1px solid var(--border);">
+          <div style="font-size:.65rem;text-transform:uppercase;color:var(--text-dim);font-weight:700;margin-bottom:.2rem;">👷 Personal</div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:.4rem;">
+            <button class="cnt-btn" onclick="manualPersonal(-1)">−</button>
+            <span id="d_personen_display" style="font-family:'Barlow Condensed',sans-serif;font-size:1.6rem;font-weight:800;color:var(--brand-navy);">2</span>
+            <button class="cnt-btn" onclick="manualPersonal(1)">+</button>
+          </div>
+          <div style="font-size:.65rem;color:var(--text-dim);">Personen</div>
+          <input type="hidden" id="d_personen" value="2">
+        </div>
+        <div style="padding:.6rem .8rem;text-align:center;border-right:1px solid var(--border);">
+          <div style="font-size:.65rem;text-transform:uppercase;color:var(--text-dim);font-weight:700;margin-bottom:.2rem;">⏱️ Beladung</div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:.4rem;">
+            <button class="cnt-btn" onclick="manualStd('be',-0.5)">−</button>
+            <span id="d_std_be_display" style="font-family:'Barlow Condensed',sans-serif;font-size:1.6rem;font-weight:800;color:var(--brand-navy);">2</span>
+            <button class="cnt-btn" onclick="manualStd('be',0.5)">+</button>
+          </div>
+          <div style="font-size:.65rem;color:var(--text-dim);">Stunden</div>
+          <input type="hidden" id="d_std_be" value="2">
+        </div>
+        <div style="padding:.6rem .8rem;text-align:center;">
+          <div style="font-size:.65rem;text-transform:uppercase;color:var(--text-dim);font-weight:700;margin-bottom:.2rem;">⏱️ Entladung</div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:.4rem;">
+            <button class="cnt-btn" onclick="manualStd('en',-0.5)">−</button>
+            <span id="d_std_en_display" style="font-family:'Barlow Condensed',sans-serif;font-size:1.6rem;font-weight:800;color:var(--brand-navy);">2</span>
+            <button class="cnt-btn" onclick="manualStd('en',0.5)">+</button>
+          </div>
+          <div style="font-size:.65rem;color:var(--text-dim);">Stunden</div>
+          <input type="hidden" id="d_std_en" value="2">
+        </div>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="fg"><label>Umzugskartons (à 2,50€)</label><input id="d_kartons" type="number" value="0" min="0" oninput="calcAll()"></div>
+      <div class="fg"><label>Kleiderbogen (à 25€)</label><input id="d_kleiderbogen" type="number" value="0" min="0" oninput="calcAll()"></div>
+    </div>
+    <div class="g2">
+      <div class="fg"><label>Möbelmontage</label>
+        <div class="rg">
+          <div class="rb sel" onclick="setRadio('z_montage','nein',this)">Nein</div>
+          <div class="rb" onclick="setRadio('z_montage','ja',this)">Ja (+200€)</div>
+        </div>
+        <input type="hidden" id="z_montage" value="nein">
+      </div>
+      <div class="fg"><label>Verpackungsmaterial</label>
+        <div class="rg">
+          <div class="rb sel" onclick="setRadio('z_verpackung','nein',this)">Nein</div>
+          <div class="rb" onclick="setRadio('z_verpackung','ja',this)">Ja (+150€)</div>
+        </div>
+        <input type="hidden" id="z_verpackung" value="nein">
+      </div>
+      <div class="fg"><label>Entrümpelung</label>
+        <div class="rg">
+          <div class="rb sel" onclick="setRadio('z_entruempel','nein',this)">Nein</div>
+          <div class="rb" onclick="setRadio('z_entruempel','ja',this)">Ja (+250€)</div>
+        </div>
+        <input type="hidden" id="z_entruempel" value="nein">
+      </div>
+      <div class="fg"><label>Klaviertransport</label>
+        <div class="rg">
+          <div class="rb sel" onclick="setRadio('z_klavier','nein',this)">Nein</div>
+          <div class="rb" onclick="setRadio('z_klavier','ja',this)">Ja (+300€)</div>
+        </div>
+        <input type="hidden" id="z_klavier" value="nein">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB: KOSTEN -->
+<div id="tab-kosten" class="tab-panel">
+  <div class="card">
+    <div class="sec-title">💶 Kostenaufstellung</div>
+    <div id="kostenLines"></div>
+    <div class="qt"><div class="qtl">Gesamtsumme</div><div class="qtv" id="kostenTotal">0,00 €</div></div>
+  </div>
+</div>
+
+<!-- TAB: ANGEBOT -->
+<div id="tab-angebot" class="tab-panel">
+  <div class="card">
+    <div class="sec-title">📋 Angebotszusammenfassung</div>
+    <div id="pdfSummary" style="font-size:.86rem;line-height:2;color:var(--text-muted);"></div>
+  </div>
+  <div class="card">
+    <div class="sec-title">💶 Kostenaufstellung</div>
+    <div id="pdfKosten"></div>
+    <div class="qt" style="margin-top:.7rem;"><div class="qtl">Gesamtsumme</div><div class="qtv" id="pdfTotal">0,00 €</div></div>
+    <div style="margin-top:.7rem;font-size:.72rem;color:var(--text-dim);">Angebot gültig 30 Tage · UmzugPreisCheck · 0160 7530900</div>
+  </div>
+  <div class="card">
+    <div class="sec-title">🖨️ Ausgabe</div>
+    <div class="brow">
+      <button class="btn btn-p" onclick="window.print()">🖨️ PDF drucken</button>
+      <button class="btn btn-wa" onclick="sendWhatsApp()">📱 WhatsApp</button>
+    </div>
+  </div>
+</div>
+
+<!-- TAB: KUNDEN -->
+<div id="tab-kunden" class="tab-panel">
+  <div class="card">
+    <div class="sec-title">👥 Kundenliste (Datenbank)</div>
+    <div id="customerList"><div class="empty">⏳ Yükleniyor...</div></div>
+    <div class="brow">
+      <button class="btn btn-g" onclick="tumunuKaydet()">💾 Aktuellen Kunden speichern</button>
+      <button class="btn btn-o" onclick="yeniMusteri()">➕ Neuer Kunde</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+// ─── MÖBEL VERİSİ ───
+const rooms=[
+  {name:"Wohnzimmer",icon:"🛋️",items:[
+    {n:"Anbauschrank bis 38cm (lfd.m)",z:1,m:.5},{n:"Anbauschrank über 38cm (lfd.m)",z:1,m:.8},
+    {n:"Bücherregal (lfd.m)",z:1,m:.4},{n:"Sofa/Couch (je Sitz)",z:1,m:.4},
+    {n:"Sessel",m:.6},{n:"Tisch bis 1m",m:.8},{n:"Tisch über 1m",m:1.2},
+    {n:"Fernseher",m:.2},{n:"Stehlampe",m:.4},{n:"Klavier",m:1.5},{n:"Flügel",m:5},
+  ]},
+  {name:"Schlafzimmer",icon:"🛏️",items:[
+    {n:"Doppelbett komplett",z:1,m:2},{n:"Einzelbett",z:1,m:1.3},
+    {n:"Schrank (lfd.m)",z:1,m:.8},{n:"Kommode",m:.8},
+    {n:"Nachtkästchen",m:.2},{n:"Spiegel",m:.2},
+  ]},
+  {name:"Küche",icon:"🍳",items:[
+    {n:"Kühlschrank",m:1},{n:"Waschmaschine/Trockner",m:.7},
+    {n:"Geschirrspüler",m:.7},{n:"Oberteil (je Tür)",z:1,m:.3},
+    {n:"Unterteil (je Tür)",z:1,m:.4},{n:"Tisch bis 1m",m:.5},{n:"Stuhl",m:.2},
+  ]},
+  {name:"Arbeitszimmer",icon:"💼",items:[
+    {n:"Schreibtisch bis 1,6m",m:1.2},{n:"Schreibtisch über 1,6m",m:1.7},
+    {n:"Bürostuhl",m:.7},{n:"Bücherregal (lfd.m)",z:1,m:.4},
+    {n:"Aktenschrank (lfd.m)",z:1,m:.8},{n:"EDV-Anlage",m:.6},
+  ]},
+  {name:"Kinderzimmer",icon:"🧸",items:[
+    {n:"Kinderbett",z:1,m:.5},{n:"Etagenbett",z:1,m:1.6},
+    {n:"Schrank (lfd.m)",z:1,m:.8},{n:"Schreibpult",m:.7},{n:"Spielzeugkiste",m:.4},
+  ]},
+  {name:"Keller/Garage",icon:"📦",items:[
+    {n:"Fahrrad",m:.5},{n:"Regal (lfd.m)",z:1,m:.4},
+    {n:"Rasenmäher",m:.4},{n:"Karton normal",m:.1},{n:"Karton groß",m:.2},
+  ]},
+];
+
+const qtys={};
+
+// ─── MÖBEL LISTESI ───
+function buildMoebel(){
+  const el=document.getElementById('moebelListe');
+  el.innerHTML='';
+  rooms.forEach((room,ri)=>{
+    room.items.forEach((_,ii)=>{qtys[ri+'_'+ii]=0;});
+    const sec=document.createElement('div');
+    sec.className='room-sec';
+    sec.innerHTML=`
+      <div class="room-hdr" onclick="toggleRoom(${ri})">
+        <span>${room.icon} ${room.name}</span>
+        <span class="rv" id="rv${ri}">0.0 m³</span>
+      </div>
+      <div class="room-body" id="rb${ri}">
+        <div class="th"><div>Bezeichnung</div><div>Zerl.</div><div>m³</div><div>Anzahl</div></div>
+        ${room.items.map((it,ii)=>`
+          <div class="fr">
+            <div class="fn">${it.n}</div>
+            <div class="fz">${it.z?'✓':''}</div>
+            <div class="fm">${it.m}</div>
+            <div class="fq"><input type="number" min="0" value="0"
+              oninput="updateQty(${ri},${ii},this.value)" onfocus="this.select()"></div>
+          </div>`).join('')}
+      </div>`;
+    el.appendChild(sec);
   });
 }
 
-function sil(id) {
-  if(!confirm('Silmek istiyorsunuz?')) return;
-  fetch('/api/musteri/' + id, {method: 'DELETE'})
-    .then(function(){ yukle(); });
+function toggleRoom(ri){
+  const b=document.getElementById('rb'+ri);
+  b.style.display=b.style.display==='none'?'':'none';
 }
 
-yukle();
+function updateQty(ri,ii,val){
+  qtys[ri+'_'+ii]=parseFloat(val)||0;
+  updateVol();autoPersonal();calcAll();
+}
+
+function updateVol(){
+  let total=0,items=0;
+  rooms.forEach((room,ri)=>{
+    let rv=0;
+    room.items.forEach((it,ii)=>{const q=qtys[ri+'_'+ii]||0;rv+=q*it.m;items+=q;});
+    const el=document.getElementById('rv'+ri);
+    if(el)el.textContent=rv.toFixed(1)+' m³';
+    total+=rv;
+  });
+  document.getElementById('totalVol').textContent=total.toFixed(1);
+  document.getElementById('totalItems').textContent=items;
+  document.getElementById('volBadge').textContent=total.toFixed(1)+' m³';
+  document.getElementById('volBar').style.width=Math.min(100,(total/100)*100)+'%';
+  return total;
+}
+
+// ─── FAHRZEUG ───
+const FAHRZEUGE={'3.5t':{kap:15,liter:8,speed:130,maut:false},'7.5t':{kap:35,liter:12,speed:100,maut:false},'12t':{kap:55,liter:18,speed:80,maut:true}};
+const fzCounts={'3.5t':0,'7.5t':0,'12t':0};
+
+function changeFz(typ,delta){
+  fzCounts[typ]=Math.max(0,Math.min(9,(fzCounts[typ]||0)+delta));
+  const idMap={'3.5t':'cnt_35','7.5t':'cnt_75','12t':'cnt_12'};
+  document.getElementById(idMap[typ]).textContent=fzCounts[typ];
+  const rowMap={'3.5t':'fzrow_35','7.5t':'fzrow_75','12t':'fzrow_12'};
+  document.getElementById(rowMap[typ]).classList.toggle('active',fzCounts[typ]>0);
+  calcAll();
+}
+
+function toggleFzRow(typ){
+  const cur=fzCounts[typ]||0;
+  changeFz(typ,cur>0?-cur:1);
+}
+
+function getFzKosten(km,krafst){
+  let kraft=0,maut=0;
+  Object.keys(fzCounts).forEach(t=>{
+    const n=fzCounts[t];if(!n)return;
+    const fz=FAHRZEUGE[t];
+    kraft+=n*km*2*(fz.liter/100)*krafst;
+    if(fz.maut)maut+=n*km*2*0.187;
+  });
+  return{kraft,maut};
+}
+
+// ─── AUTO PERSONAL ───
+function autoPersonal(){
+  const vol=parseFloat(document.getElementById('totalVol').textContent)||0;
+  const bEt=parseInt(document.getElementById('b_etage').value)||0;
+  const eEt=parseInt(document.getElementById('e_etage').value)||0;
+  let pers=2;
+  if(vol<=10)pers=2;else if(vol<=20)pers=2;else if(vol<=35)pers=3;
+  else if(vol<=55)pers=4;else if(vol<=80)pers=5;else pers=6;
+  let stdBe=Math.max(1.5,Math.round(vol/8*2)/2);
+  let stdEn=Math.max(1.5,Math.round(vol/10*2)/2);
+  if(bEt>0)stdBe+=0.5;
+  if(eEt>0)stdEn+=0.5;
+  pers=Math.min(8,Math.max(2,pers));
+  stdBe=Math.min(8,stdBe);
+  stdEn=Math.min(8,stdEn);
+  setPersonal(pers,stdBe,stdEn);
+  if(vol>0){
+    document.getElementById('personalEmpfCard').style.display='block';
+    document.getElementById('personalEmpfText').textContent=`${pers} Personen · ${stdBe}h Beladung · ${stdEn}h Entladung`;
+  }
+}
+
+function setPersonal(pers,stdBe,stdEn){
+  document.getElementById('d_personen').value=pers;
+  document.getElementById('d_personen_display').textContent=pers;
+  document.getElementById('d_std_be').value=stdBe;
+  document.getElementById('d_std_be_display').textContent=stdBe;
+  document.getElementById('d_std_en').value=stdEn;
+  document.getElementById('d_std_en_display').textContent=stdEn;
+  calcAll();
+}
+
+function manualPersonal(delta){
+  const cur=parseInt(document.getElementById('d_personen').value)||2;
+  const neu=Math.min(10,Math.max(1,cur+delta));
+  document.getElementById('d_personen').value=neu;
+  document.getElementById('d_personen_display').textContent=neu;
+  calcAll();
+}
+
+function manualStd(typ,delta){
+  const id='d_std_'+typ;
+  const cur=parseFloat(document.getElementById(id).value)||2;
+  const neu=Math.min(12,Math.max(0.5,Math.round((cur+delta)*2)/2));
+  document.getElementById(id).value=neu;
+  document.getElementById('d_std_'+typ+'_display').textContent=neu;
+  calcAll();
+}
+
+// ─── HESAPLAMA ───
+function calcAll(){
+  const vol=updateVol();
+  const km=pf('d_km'),pers=pf('d_personen'),stdBe=pf('d_std_be'),stdEn=pf('d_std_en');
+  const stdT=stdBe+stdEn,krafst=pf('d_kraftstoff');
+  const kartons=pf('d_kartons'),kleider=pf('d_kleiderbogen');
+  const bEt=pi('b_etage'),eEt=pi('e_etage');
+  const bTr=pf('b_trageweg'),eTr=pf('e_trageweg');
+  const bLift=v('b_lift')==='ja',eLift=v('e_lift')==='ja';
+  const bHalt=v('b_halteverbot')==='ja',eHalt=v('e_halteverbot')==='ja';
+  const mont=v('z_montage')==='ja',verpk=v('z_verpackung')==='ja';
+  const entru=v('z_entruempel')==='ja',klav=v('z_klavier')==='ja';
+  const anhaenger=v('d_anhaenger')==='ja';
+
+  let volP=0;
+  if(vol<=10)volP=Math.max(350,vol*35);
+  else if(vol<=20)volP=350+(vol-10)*30;
+  else if(vol<=30)volP=650+(vol-20)*25;
+  else volP=900+(vol-30)*22;
+
+  const etageK=bEt+eEt;
+  const trageK=(bTr>5?bTr-5:0)+(eTr>5?eTr-5:0);
+  const {kraft:kraftK,maut:mautK}=getFzKosten(km,krafst);
+  const perK=pers*stdT*35;
+  const kartK=kartons*2.5,kleidK=kleider*25;
+  const liftK=(bLift?150:0)+(eLift?150:0);
+  const haltK=(bHalt?80:0)+(eHalt?80:0);
+  const montK=mont?200:0,verpkK=verpk?150:0,entruK=entru?250:0,klavK=klav?300:0;
+  const anhK=anhaenger?40:0;
+
+  const zw=volP+etageK+trageK+kraftK+mautK+anhK+perK+kartK+kleidK+liftK+haltK+montK+verpkK+entruK+klavK;
+  const zuschlag=zw*0.10;
+  const ges=zw+zuschlag;
+
+  const lines=[
+    {n:'📦 Basiskosten (Volumen)',c:`${vol.toFixed(1)} m³`,v:volP},
+    {n:'🏢 Etagenzuschlag',c:`Beladen:${bEt}€ + Entladen:${eEt}€`,v:etageK,hide:etageK===0},
+    {n:'🚶 Trageweg',c:`${bTr}m + ${eTr}m`,v:trageK,hide:trageK===0},
+    {n:'⛽ Kraftstoff',c:`${km}km × 2 × ${krafst}€/L`,v:kraftK},
+    {n:'🛣️ Maut',c:'12t LKW',v:mautK,hide:mautK===0},
+    {n:'🔗 Anhänger',v:anhK,hide:!anhaenger},
+    {n:'👷 Personalkosten',c:`${pers}P × ${stdT}h × 35€`,v:perK,hl:1},
+    {n:'📦 Umzugskartons',c:`${kartons} Stk × 2,50€`,v:kartK,hide:kartons===0},
+    {n:'👗 Kleiderbogen',c:`${kleider} Stk × 25€`,v:kleidK,hide:kleider===0},
+    {n:'🏗️ Möbellift',v:liftK,hide:liftK===0},
+    {n:'🅿️ Halteverbot',v:haltK,hide:haltK===0},
+    {n:'🔧 Möbelmontage',v:montK,hide:!mont},
+    {n:'📦 Verpackung',v:verpkK,hide:!verpk},
+    {n:'🗑️ Entrümpelung',v:entruK,hide:!entru},
+    {n:'🎹 Klavier',v:klavK,hide:!klav},
+    {n:'Zwischensumme',v:zw,bold:1},
+    {n:'Zuschlag (10%)',v:zuschlag},
+  ];
+
+  const html=lines.filter(l=>!l.hide).map(l=>`
+    <div class="kr${l.bold?' bold':l.hl?' hl':''}">
+      <div><div class="kn">${l.n}</div>${l.c?`<div class="kc">${l.c}</div>`:''}</div>
+      <div class="kv">${fmt(l.v)}</div>
+    </div>`).join('');
+
+  document.getElementById('kostenLines').innerHTML=html;
+  document.getElementById('kostenTotal').textContent=fmt(ges);
+  document.getElementById('pdfKosten').innerHTML=html;
+  document.getElementById('pdfTotal').textContent=fmt(ges);
+
+  document.getElementById('pdfSummary').innerHTML=`
+    <strong>Angebotsnr.:</strong> ${v('k_angebotsnr')||'—'} &nbsp;|&nbsp;
+    <strong>Datum:</strong> ${v('k_datum')||'—'}<br>
+    <strong>Kunde:</strong> ${v('k_name')||'—'} &nbsp;|&nbsp; <strong>Tel:</strong> ${v('k_tel')||'—'}<br>
+    <strong>Von:</strong> ${v('b_strasse')||'—'}, ${v('b_plz')||'—'}<br>
+    <strong>Nach:</strong> ${v('e_strasse')||'—'}, ${v('e_plz')||'—'}<br>
+    <strong>Termin:</strong> ${v('k_umzugsdatum')||'—'} &nbsp;|&nbsp;
+    <strong>Volumen:</strong> ${vol.toFixed(1)} m³ &nbsp;|&nbsp;
+    <strong>Entfernung:</strong> ${km} km &nbsp;|&nbsp;
+    <strong>Personal:</strong> ${pers} Pers. × ${stdT} Std`;
+}
+
+// ─── CITY SEARCH ───
+let bC=null,eC=null,acT=null;
+async function citySearch(side){
+  const inp=document.getElementById(side+'_plz');
+  const val=inp.value.trim();
+  clearTimeout(acT);
+  if(val.length<2){hideAC(side);return;}
+  acT=setTimeout(async()=>{
+    try{
+      const r=await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(val+', Deutschland')}&format=json&limit=5&countrycodes=de`);
+      const d=await r.json();
+      if(d.length){
+        const ac=document.getElementById(side+'_ac');
+        ac.innerHTML=d.map(x=>`<div class="ac-item" onclick="selCity('${side}','${x.display_name.replace(/'/g,"\\'").substring(0,60)}',${x.lat},${x.lon})">📍 ${x.display_name.substring(0,60)}</div>`).join('');
+        ac.style.display='block';
+      }else hideAC(side);
+    }catch(e){hideAC(side);}
+  },400);
+}
+function hideAC(s){document.getElementById(s+'_ac').style.display='none';}
+function selCity(side,name,lat,lon){
+  document.getElementById(side+'_plz').value=name.split(',').slice(0,2).join(',');
+  hideAC(side);
+  if(side==='b')bC={lat:+lat,lon:+lon};else eC={lat:+lat,lon:+lon};
+  if(bC&&eC){
+    const km=Math.round(haversine(bC.lat,bC.lon,eC.lat,eC.lon));
+    document.getElementById('d_km').value=km;
+    document.getElementById('kmStatus').textContent='✅ '+km+' km (Luftlinie)';
+    calcAll();
+  }
+}
+function haversine(a,b,c,d){const R=6371,dl=(c-a)*Math.PI/180,dL=(d-b)*Math.PI/180;const x=Math.sin(dl/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dL/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
+document.addEventListener('click',e=>{if(!e.target.closest('.ac-wrap')){hideAC('b');hideAC('e');}});
+
+// ─── UTILS ───
+function v(id){return document.getElementById(id)?.value||'';}
+function pf(id){return parseFloat(document.getElementById(id)?.value)||0;}
+function pi(id){return parseInt(document.getElementById(id)?.value)||0;}
+function fmt(n){return(n||0).toFixed(2).replace('.',',')+' €';}
+function showNotif(msg){
+  const el=document.getElementById('notif');
+  el.textContent=msg;el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2800);
+}
+function setRadio(id,val,btn){
+  btn.parentElement.querySelectorAll('.rb').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  document.getElementById(id).value=val;
+  if(['b_aufzug','e_aufzug','b_lift','e_lift'].includes(id))autoPersonal();
+  calcAll();
+}
+function showTab(id){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  document.getElementById('tb-'+id).classList.add('active');
+  if(['angebot','kosten'].includes(id))calcAll();
+  if(id==='kunden')apiMusterileriYukle();
+}
+function sendWhatsApp(){
+  const msg=`*UmzugPreisCheck Angebot*\n\nKunde: ${v('k_name')||'—'}\nTermin: ${v('k_umzugsdatum')||'—'}\nVon: ${v('b_plz')||'—'}\nNach: ${v('e_plz')||'—'}\nVolumen: ${document.getElementById('totalVol').textContent} m³\n\n*Gesamtpreis: ${document.getElementById('pdfTotal').textContent}*\n\nUmzugPreisCheck · 0160 7530900`;
+  window.open('https://wa.me/?text='+encodeURIComponent(msg));
+}
+function yeniMusteri(){
+  ['k_name','k_datum','k_tel','k_email','k_umzugsdatum','k_bearbeiter','k_stadt','k_notizen',
+   'b_name','b_strasse','b_plz','b_tel','e_name','e_strasse','e_plz','e_tel','d_km'].forEach(f=>{
+    const el=document.getElementById(f);if(el)el.value='';
+  });
+  document.getElementById('k_angebotsnr').value='UMZ-'+String(Date.now()).slice(-6);
+  setPersonal(2,2,2);
+  Object.keys(qtys).forEach(k=>{qtys[k]=0;});
+  document.querySelectorAll('.fq input').forEach(i=>i.value=0);
+  bC=null;eC=null;
+  window._aktifMusteriId=null;
+  calcAll();showTab('kunde');showNotif('➕ Neuer Kunde');
+}
+
+// ─── BACKEND API BAĞLANTISI ───
+const API='';
+
+async function apiMusteriKaydet(){
+  const name=document.getElementById('k_name')?.value?.trim();
+  if(!name){showNotif('⚠️ Lütfen müşteri adı girin!');return null;}
+  const body={
+    name,
+    telefon:    document.getElementById('k_tel')?.value||'',
+    email:      document.getElementById('k_email')?.value||'',
+    umzugsdatum:document.getElementById('k_umzugsdatum')?.value||'',
+    angebotsnr: document.getElementById('k_angebotsnr')?.value||'',
+    notizen:    document.getElementById('k_notizen')?.value||''
+  };
+  try{
+    const r=await fetch(API+'/api/musteri',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d=await r.json();
+    if(d.basarili){showNotif('✅ Kaydedildi! ID: '+d.id);window._aktifMusteriId=d.id;return d.id;}
+  }catch(e){showNotif('❌ Kayıt hatası: '+e.message);}
+  return null;
+}
+
+async function apiAngebotKaydet(musteriId){
+  const vol=parseFloat(document.getElementById('totalVol')?.textContent)||0;
+  const body={
+    musteri_id:  musteriId,
+    von_strasse: document.getElementById('b_strasse')?.value||'',
+    von_plz:     document.getElementById('b_plz')?.value||'',
+    von_etage:   parseInt(document.getElementById('b_etage')?.value)||0,
+    nach_strasse:document.getElementById('e_strasse')?.value||'',
+    nach_plz:    document.getElementById('e_plz')?.value||'',
+    nach_etage:  parseInt(document.getElementById('e_etage')?.value)||0,
+    km:          parseFloat(document.getElementById('d_km')?.value)||0,
+    volumen:     vol,
+    personen:    parseInt(document.getElementById('d_personen')?.value)||2,
+    stunden:     (parseFloat(document.getElementById('d_std_be')?.value)||0)+(parseFloat(document.getElementById('d_std_en')?.value)||0),
+    gesamtpreis: parseFloat(document.getElementById('kostenTotal')?.textContent?.replace(/[^\d,]/g,'')?.replace(',','.'))||0
+  };
+  try{
+    const r=await fetch(API+'/api/angebot',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d=await r.json();
+    if(d.basarili)showNotif('✅ Teklif kaydedildi!');
+  }catch(e){showNotif('❌ Teklif hatası: '+e.message);}
+}
+
+async function apiMoebelKaydet(musteriId){
+  const moebel=[];
+  rooms.forEach((room,ri)=>{
+    room.items.forEach((item,ii)=>{
+      const adet=qtys[ri+'_'+ii]||0;
+      if(adet>0)moebel.push({raum:room.name,bezeichnung:item.n,anzahl:adet,m3:item.m*adet});
+    });
+  });
+  if(!moebel.length)return;
+  try{
+    const r=await fetch(API+'/api/moebel',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({musteri_id:musteriId,moebel})});
+    const d=await r.json();
+    if(d.basarili)showNotif('✅ Möbel kaydedildi!');
+  }catch(e){showNotif('❌ Möbel hatası: '+e.message);}
+}
+
+async function apiMusterileriYukle(){
+  try{
+    const r=await fetch(API+'/api/musteriler');
+    const liste=await r.json();
+    const el=document.getElementById('customerList');
+    if(!liste.length){el.innerHTML='<div class="empty">📭 Henüz kayıtlı müşteri yok.</div>';return;}
+    el.innerHTML='<div class="cust-list">'+liste.map(c=>`
+      <div class="ci${window._aktifMusteriId==c.id?' act':''}" onclick="apiMusteriYukle(${c.id})">
+        <div style="font-size:1.4rem;">👤</div>
+        <div style="flex:1"><div class="ci-nm">${c.name}</div>
+          <div class="ci-mt">${c.angebotsnr||'—'} · ${c.umzugsdatum||'—'}</div></div>
+        <button class="ci-del" onclick="apiMusteriSil(${c.id},event)">🗑️</button>
+      </div>`).join('')+'</div>';
+  }catch(e){showNotif('❌ Liste yüklenemedi: '+e.message);}
+}
+
+async function apiMusteriYukle(id){
+  try{
+    const r=await fetch(API+'/api/musteri/'+id);
+    const d=await r.json();
+    if(!d.musteri)return;
+    window._aktifMusteriId=id;
+    const m=d.musteri;
+    document.getElementById('k_name').value=m.name||'';
+    document.getElementById('k_tel').value=m.telefon||'';
+    document.getElementById('k_email').value=m.email||'';
+    document.getElementById('k_umzugsdatum').value=m.umzugsdatum||'';
+    document.getElementById('k_angebotsnr').value=m.angebotsnr||'';
+    document.getElementById('k_notizen').value=m.notizen||'';
+    if(d.angebot){
+      const a=d.angebot;
+      document.getElementById('b_strasse').value=a.von_strasse||'';
+      document.getElementById('b_plz').value=a.von_plz||'';
+      document.getElementById('e_strasse').value=a.nach_strasse||'';
+      document.getElementById('e_plz').value=a.nach_plz||'';
+      document.getElementById('d_km').value=a.km||0;
+    }
+    showNotif('📂 Yüklendi: '+m.name);
+    showTab('kunde');calcAll();
+  }catch(e){showNotif('❌ Yükleme hatası: '+e.message);}
+}
+
+async function apiMusteriSil(id,event){
+  event.stopPropagation();
+  if(!confirm('Bu müşteriyi silmek istediğinize emin misiniz?'))return;
+  try{
+    const r=await fetch(API+'/api/musteri/'+id,{method:'DELETE'});
+    const d=await r.json();
+    if(d.basarili){showNotif('🗑️ Müşteri silindi!');apiMusterileriYukle();}
+  }catch(e){showNotif('❌ Silme hatası: '+e.message);}
+}
+
+async function tumunuKaydet(){
+  showNotif('💾 Kaydediliyor...');
+  const musteriId=await apiMusteriKaydet();
+  if(!musteriId)return;
+  await apiAngebotKaydet(musteriId);
+  await apiMoebelKaydet(musteriId);
+  showNotif('✅ Tüm veriler kaydedildi! ID: '+musteriId);
+}
+
+// ─── INIT ───
+buildMoebel();
+calcAll();
+document.getElementById('k_datum').value=new Date().toISOString().split('T')[0];
+document.getElementById('k_angebotsnr').value='UMZ-'+String(Date.now()).slice(-6);
+apiMusterileriYukle();
 </script>
 </body>
 </html>
